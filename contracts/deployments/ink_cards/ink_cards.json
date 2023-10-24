@@ -1,6 +1,6 @@
 {
   "source": {
-    "hash": "0xca1725d16c9a936705768a2e15ba01f4abed6d306499e6461962cf765f873c27",
+    "hash": "0xd307de978b3521d67772bf8da4ccc6e05b1b9c4054988427e1b434a10d84b440",
     "language": "ink! 4.3.0",
     "compiler": "rustc 1.69.0",
     "build_info": {
@@ -14,7 +14,7 @@
     }
   },
   "contract": {
-    "name": "greeter",
+    "name": "ink_cards",
     "version": "0.0.1",
     "authors": [
       "Scio Labs <hello@scio.xyz>"
