@@ -35,6 +35,7 @@ pub mod ink_cards {
         fn issue_card(
             &mut self,
             spend_limit: Balance,
+            card_name: String,
             days: u64,
             beneficiary: AccountId,
         ) -> Result<(), PSP34Error> {
@@ -46,6 +47,7 @@ pub mod ink_cards {
             }
             let expiration = <Self as DefaultEnv>::env().block_timestamp() + (days * 86_400_000);
             let card_info = &CardInfo {
+                card_name: card_name,
                 spent_amount: 0,
                 spend_limit: spend_limit,
                 expiration: expiration,

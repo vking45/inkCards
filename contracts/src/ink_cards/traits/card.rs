@@ -3,7 +3,7 @@ use openbrush::{
         ownable::*,
         psp34::{extensions::metadata::*, *},
     },
-    traits::{AccountId, Balance, Timestamp},
+    traits::{AccountId, Balance, String, Timestamp},
 };
 
 #[cfg(feature = "std")]
@@ -12,6 +12,7 @@ use ink::storage::traits::StorageLayout;
 #[derive(Debug, Clone, scale::Encode, scale::Decode)]
 #[cfg_attr(feature = "std", derive(StorageLayout, scale_info::TypeInfo))]
 pub struct CardInfo {
+    pub card_name: String,
     pub spent_amount: Balance,
     pub spend_limit: Balance,
     pub expiration: Timestamp,
@@ -20,6 +21,7 @@ pub struct CardInfo {
 impl Default for CardInfo {
     fn default() -> Self {
         Self {
+            card_name: String::default(),
             spent_amount: Balance::default(),
             spend_limit: Balance::default(),
             expiration: Timestamp::default(),
@@ -36,6 +38,7 @@ pub trait Card: PSP34 + PSP34Metadata + Ownable {
     fn issue_card(
         &mut self,
         spend_limit: Balance,
+        card_name: String,
         days: u64,
         beneficiary: AccountId,
     ) -> Result<(), PSP34Error>;
