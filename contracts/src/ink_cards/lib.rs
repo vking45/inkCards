@@ -22,6 +22,7 @@ pub mod ink_cards {
         #[storage_field]
         metadata: metadata::Data,
 
+        pool_vol: Balance,
         pool_size: Balance,
         pool_name: String,
         cards_mapping: Mapping<Id, CardInfo>,
@@ -60,6 +61,10 @@ pub mod ink_cards {
             amount: Balance,
             to_addr: AccountId,
         ) -> Result<(), PSP34Error> {
+            if self.pool_size < amount {
+                return Err(PSP34Error::Custom(String::from("Insufficient pool size")));
+            }
+
             let caller = <Self as DefaultEnv>::env().caller();
 
             if psp34::Internal::_owner_of(self, &card_id) != Some(caller) {
@@ -84,6 +89,7 @@ pub mod ink_cards {
                 } else {
                     card_info.spent_amount -= amount;
                     self.cards_mapping.insert(&card_id, &card_info);
+                    self.pool_size -= 1;
                     Ok(())
                 }
             } else {
@@ -103,13 +109,11 @@ pub mod ink_cards {
 
     impl PoolContract {
         #[ink(constructor, payable)]
-        pub fn new(pool_name: String, pool_size: Balance) -> Self {
+        pub fn new(pool_name: String) -> Self {
             let mut instance = Self::default();
             instance.pool_name = pool_name;
-            instance.pool_size = pool_size;
+            instance.pool_size = 0;
             instance.last_card_id = Id::U128(1);
-
-            // Make a transfer funds check here !
 
             metadata::Internal::_set_attribute(
                 &mut instance,
@@ -123,6 +127,19 @@ pub mod ink_cards {
             );
 
             instance
+        }
+
+        #[modifiers(only_owner)]
+        #[ink(message, payable)]
+        pub fn add_funds(&mut self, add_amount: Balance) -> Result<(), PSP34Error> {
+            let value = <Self as DefaultEnv>::env().transferred_value();
+            if value == add_amount {
+                self.pool_size += add_amount;
+                self.pool_vol += add_amount;
+                Ok(())
+            } else {
+                return Err(PSP34Error::Custom(String::from("Invalid transfer")));
+            }
         }
 
         fn _get_next_card_id_and_increase(&mut self) -> Result<Id, PSP34Error> {
