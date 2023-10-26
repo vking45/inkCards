@@ -22,6 +22,7 @@ pub mod ink_cards {
         #[storage_field]
         metadata: metadata::Data,
 
+        pool_size: Balance,
         pool_name: String,
         cards_mapping: Mapping<Id, CardInfo>,
         last_card_id: Id,
@@ -59,11 +60,35 @@ pub mod ink_cards {
             amount: Balance,
             to_addr: AccountId,
         ) -> Result<(), PSP34Error> {
+            let caller = <Self as DefaultEnv>::env().caller();
+
+            if psp34::Internal::_owner_of(self, &card_id) != Some(caller) {
+                return Err(PSP34Error::Custom(String::from("Card not owned")));
+            }
+
             let card_info = self.cards_mapping.get(&card_id);
-            if card_info.is_none() {
+
+            if !card_info.is_none() {
+                let mut card_info = card_info.unwrap();
+
+                if card_info.spent_amount + amount > card_info.spend_limit {
+                    return Err(PSP34Error::Custom(String::from("Limit exceeded")));
+                }
+
+                if <Self as DefaultEnv>::env().block_timestamp() > card_info.expiration {
+                    return Err(PSP34Error::Custom(String::from("Card expired")));
+                }
+
+                if let Err(_) = <Self as DefaultEnv>::env().transfer(to_addr, amount) {
+                    return Err(PSP34Error::Custom(String::from("Funds transfer failed")));
+                } else {
+                    card_info.spent_amount -= amount;
+                    self.cards_mapping.insert(&card_id, &card_info);
+                    Ok(())
+                }
+            } else {
                 return Err(PSP34Error::Custom(String::from("Card does not exist")));
             }
-            Ok(())
         }
 
         #[ink(message)]
@@ -78,10 +103,14 @@ pub mod ink_cards {
 
     impl PoolContract {
         #[ink(constructor, payable)]
-        pub fn new(pool_name: String) -> Self {
+        pub fn new(pool_name: String, pool_size: Balance) -> Self {
             let mut instance = Self::default();
             instance.pool_name = pool_name;
+            instance.pool_size = pool_size;
             instance.last_card_id = Id::U128(1);
+
+            // Make a transfer funds check here !
+
             metadata::Internal::_set_attribute(
                 &mut instance,
                 Id::U8(1u8),
