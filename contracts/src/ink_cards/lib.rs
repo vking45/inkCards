@@ -89,9 +89,9 @@ pub mod ink_cards {
                 if let Err(_) = <Self as DefaultEnv>::env().transfer(to_addr, amount) {
                     return Err(PSP34Error::Custom(String::from("Funds transfer failed")));
                 } else {
-                    card_info.spent_amount -= amount;
+                    card_info.spent_amount += amount;
                     self.cards_mapping.insert(&card_id, &card_info);
-                    self.pool_size -= 1;
+                    self.pool_size -= amount;
                     Ok(())
                 }
             } else {
