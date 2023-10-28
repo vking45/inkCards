@@ -26,7 +26,7 @@ pub mod ink_cards {
 
         pool_vol: Balance,
         pool_size: Balance,
-        pool_name: String,
+        pool_name: Vec<u8>,
         cards_mapping: Mapping<Id, CardInfo>,
         last_card_id: Id,
     }
@@ -113,7 +113,7 @@ pub mod ink_cards {
 
     impl PoolContract {
         #[ink(constructor, payable)]
-        pub fn new(pool_name: String) -> Self {
+        pub fn new(pool_name: Vec<u8>) -> Self {
             let mut instance = Self::default();
             instance.pool_name = pool_name;
             instance.pool_size = 0;
@@ -148,7 +148,7 @@ pub mod ink_cards {
 
         #[ink(message)]
         pub fn get_address(&self) -> AccountId {
-            self.env().account_id()
+            <Self as DefaultEnv>::env().account_id()
         }
 
         fn _get_next_card_id_and_increase(&mut self) -> Result<Id, PSP34Error> {

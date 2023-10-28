@@ -1,6 +1,6 @@
 {
   "source": {
-    "hash": "0x330bb68335442a58c784910948e1f508ba7358a6f18723f43fd191ba29122166",
+    "hash": "0x133527acbbc1f4e331ecb39f610758b3f3910132c53610260c3ef82211e919e2",
     "language": "ink! 4.3.0",
     "compiler": "rustc 1.69.0",
     "build_info": {
@@ -93,7 +93,7 @@
             "label": "pool_name",
             "type": {
               "displayName": [
-                "String"
+                "Vec"
               ],
               "type": 7
             }
@@ -275,7 +275,9 @@
       "id": 7,
       "type": {
         "def": {
-          "primitive": "str"
+          "sequence": {
+            "type": 3
+          }
         }
       }
     },

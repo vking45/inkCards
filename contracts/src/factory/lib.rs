@@ -5,7 +5,6 @@ mod factory {
 
     use ink::prelude::vec::Vec;
     use ink_cards::PoolContractRef;
-    use openbrush::traits::String;
 
     #[ink(storage)]
     pub struct Factory {
@@ -21,22 +20,25 @@ mod factory {
         }
 
         #[ink(message)]
-        pub fn create_pool(&mut self, pool_name: String) -> AccountId {
+        pub fn create_pool(&mut self, pool_name: Vec<u8>) -> AccountId {
             const CODE_HASH: [u8; 32] = [
-                0x3f, 0x16, 0xb1, 0x98, 0x30, 0x95, 0x5f, 0x8d, 0x8d, 0xf5, 0x93, 0x7c, 0xad, 0x2f,
-                0x16, 0x24, 0xcc, 0x6f, 0xc8, 0xee, 0xca, 0x0c, 0x8d, 0xdc, 0x1b, 0xf4, 0xb2, 0x8f,
-                0xb1, 0x06, 0x91, 0xe1,
+                0x35, 0xd6, 0x2c, 0x34, 0x8d, 0x50, 0x57, 0xb8, 0xd6, 0x4f, 0x46, 0x36, 0xc4, 0xc8,
+                0xcc, 0x28, 0x49, 0xf5, 0xb0, 0xc4, 0x7b, 0xc2, 0xd2, 0x74, 0x72, 0x9a, 0x20, 0x9f,
+                0x6c, 0x92, 0xd5, 0xb4,
             ];
+
+            let salt = Hash::from([0x42; 32]);
             // Instantiate the PoolContract
             let pool_instance = PoolContractRef::new(pool_name)
                 .code_hash(Hash::from(CODE_HASH))
                 .endowment(0)
-                .salt_bytes(self.env().block_timestamp().to_le_bytes())
+                .salt_bytes(salt)
                 .instantiate();
             // Capture the created contract's AccountId
             let pool_address = pool_instance.get_address();
-            // Store the address in our list
+
             self.deployed_contracts.push(pool_address);
+
             pool_address
         }
 
