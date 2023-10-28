@@ -113,7 +113,7 @@ pub mod ink_cards {
 
     impl PoolContract {
         #[ink(constructor, payable)]
-        pub fn new(pool_name: Vec<u8>) -> Self {
+        pub fn new(pool_name: Vec<u8>, owner: AccountId) -> Self {
             let mut instance = Self::default();
             instance.pool_name = pool_name;
             instance.pool_size = 0;
@@ -125,10 +125,7 @@ pub mod ink_cards {
                 String::from("InkCards NFT"),
                 String::from("ICNFTS"),
             );
-            ownable::Internal::_init_with_owner(
-                &mut instance,
-                <Self as DefaultEnv>::env().caller(),
-            );
+            ownable::Internal::_init_with_owner(&mut instance, owner);
 
             instance
         }
