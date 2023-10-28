@@ -22,9 +22,9 @@ function MyApp({ Component, pageProps }: AppProps) {
       <DefaultSeo
         dangerouslySetAllPagesToNoFollow={!env.isProduction}
         dangerouslySetAllPagesToNoIndex={!env.isProduction}
-        defaultTitle="ink!athon" // TODO
-        titleTemplate="%s | ink!athon" // TODO
-        description="Substrate-based Smart Contract & DApp Development Boilerplate" // TODO
+        defaultTitle="inkCards" // TODO
+        titleTemplate="%s | inkCards" // TODO
+        description="An ink based project for tokenised debit cards" // TODO
         openGraph={{
           type: 'website',
           locale: 'en',
