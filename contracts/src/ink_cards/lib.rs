@@ -2,6 +2,8 @@
 
 pub mod traits;
 
+pub use self::ink_cards::PoolContractRef;
+
 #[openbrush::implementation(PSP34, Ownable, PSP34Metadata)]
 #[openbrush::contract]
 pub mod ink_cards {
@@ -142,6 +144,11 @@ pub mod ink_cards {
             } else {
                 return Err(PSP34Error::Custom(String::from("Invalid transfer")));
             }
+        }
+
+        #[ink(message)]
+        pub fn get_address(&self) -> AccountId {
+            self.env().account_id()
         }
 
         fn _get_next_card_id_and_increase(&mut self) -> Result<Id, PSP34Error> {
