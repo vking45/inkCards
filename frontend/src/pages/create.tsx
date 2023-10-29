@@ -1,13 +1,49 @@
 import React, { FC, useEffect, useState, ChangeEvent } from 'react'
 import 'twin.macro'
-import { useInkathon } from '@scio-labs/use-inkathon'
 import type { NextPage } from 'next'
 import { toast } from 'react-hot-toast'
+import {
+  contractQuery,
+  decodeOutput,
+  useInkathon,
+  useRegisteredContract,
+} from '@scio-labs/use-inkathon'
 import { HomeTopBar } from '@/components/home/HomeTopBar'
+import { ContractIds } from '@/deployments/deployments'
+import { contractTxWithToast } from '@/utils/contractTxWithToast'
 
 const CreateForm: NextPage = () => {
+  const { api, activeAccount, activeSigner } = useInkathon()
+  const { contract, address: contractAddress } = useRegisteredContract(ContractIds.Factory)
+  const [updateIsLoading, setUpdateIsLoading] = useState<boolean>()
+
   const [amount, setAmount] = useState<string>('$')
   const [name, setName] = useState<string>('')
+
+  const createPool = async () => {
+    if (!activeAccount || !contract || !activeSigner || !api) {
+      toast.error('Wallet not connected. Try again…')
+      return
+    }
+
+    // Send transaction
+    setUpdateIsLoading(true)
+    try {
+      const res = await contractTxWithToast(
+        api,
+        activeAccount.address,
+        contract,
+        'createPool',
+        {},
+        [name],
+      )
+      console.log(res)
+    } catch (e) {
+      console.error(e)
+    } finally {
+      setUpdateIsLoading(false)
+    }
+  }
 
   const { error } = useInkathon()
   useEffect(() => {
@@ -71,10 +107,11 @@ const CreateForm: NextPage = () => {
 
               <div tw="mt-4 flex justify-center">
                 <button
+                  onClick={createPool}
                   tw="rounded bg-emerald-600 py-2 px-4 font-bold text-white hover:bg-emerald-700 focus:(outline-none outline-emerald-50)"
                   type="submit"
                 >
-                  Create Pool
+                  {updateIsLoading ? 'Loading..' : 'Create Pool'}
                 </button>
               </div>
             </div>
