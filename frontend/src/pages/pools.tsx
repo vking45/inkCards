@@ -1,6 +1,13 @@
-import React, { FC, useEffect } from 'react'
+import React, { FC, useEffect, useState } from 'react'
+import {
+  contractQuery,
+  decodeOutput,
+  useInkathon,
+  useRegisteredContract,
+} from '@scio-labs/use-inkathon'
+import { ContractIds } from '@/deployments/deployments'
+import { contractTxWithToast } from '@/utils/contractTxWithToast'
 import 'twin.macro'
-import { useInkathon } from '@scio-labs/use-inkathon'
 import type { NextPage } from 'next'
 import { toast } from 'react-hot-toast'
 import { HomeTopBar } from '@/components/home/HomeTopBar'
@@ -12,17 +19,45 @@ interface Pool {
 }
 
 const ManageScreen: NextPage = () => {
-  const pools: Pool[] = [
-    { amount: '$1000', description: 'lorem Ipsum' },
-    { amount: '$1500', description: 'lorem Ipsum' },
-    { amount: '$2000', description: 'lorem Ipsum' },
-  ]
+  const [pools, setPools] = useState<Pool[]>([])
+  const { api, activeAccount, activeSigner } = useInkathon()
+  const { contract, address: contractAddress } = useRegisteredContract(ContractIds.Factory)
+  const [fetchIsLoading, setFetchIsLoading] = useState<boolean>()
+
+  const fetchPools = async () => {
+    if (!activeAccount || !contract || !activeSigner || !api) {
+      toast.error('Wallet not connected. Try again…')
+      return
+    }
+
+    setFetchIsLoading(true)
+    try {
+      const result = await contractTxWithToast(
+        api,
+        activeAccount.address,
+        contract,
+        'getDeployedContracts',
+        {},
+        [],
+      )
+      console.log(result)
+    } catch (e) {
+      console.error(e)
+      toast.error('Error while fetching pools. Try again…')
+    } finally {
+      setFetchIsLoading(false)
+    }
+  }
 
   const { error } = useInkathon()
   useEffect(() => {
     if (!error) return
     toast.error(error.message)
   }, [error])
+
+  useEffect(() => {
+    fetchPools()
+  }, [contract])
 
   return (
     <>
@@ -34,14 +69,16 @@ const ManageScreen: NextPage = () => {
         <section tw="text-gray-600">
           <div tw="container mx-auto px-5 py-24">
             <div tw="-m-4 flex flex-wrap">
-              {pools.map((pool, index) => (
-                <div key={index} tw="p-4 lg:w-1/3">
-                  <div tw="relative h-full cursor-pointer overflow-hidden rounded-lg bg-gradient-to-b bg-opacity-75 from-emerald-600 to-emerald-800 px-8 pt-16 pb-24 text-center transition-all duration-300 hover:scale-105">
-                    <h1 tw="mb-3 font-medium text-8xl text-gray-100">{pool.amount}</h1>
-                    <p tw="mb-3 text-gray-200 leading-10 tracking-widest">{pool.description}</p>
-                  </div>
-                </div>
-              ))}
+              {fetchIsLoading
+                ? 'Loading...'
+                : pools.map((pool, index) => (
+                    <div key={index} tw="p-4 lg:w-1/3">
+                      <div tw="relative h-full cursor-pointer overflow-hidden rounded-lg bg-gradient-to-b bg-opacity-75 from-emerald-600 to-emerald-800 px-8 pt-16 pb-24 text-center transition-all duration-300 hover:scale-105">
+                        <h1 tw="mb-3 font-medium text-8xl text-gray-100">{pool.amount}</h1>
+                        <p tw="mb-3 text-gray-200 leading-10 tracking-widest">{pool.description}</p>
+                      </div>
+                    </div>
+                  ))}
             </div>
             <div tw="mt-8 flex justify-center">
               <Link
