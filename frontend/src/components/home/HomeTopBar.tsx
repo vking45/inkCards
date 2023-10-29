@@ -1,6 +1,5 @@
 import Link from 'next/link'
 import { FC } from 'react'
-import { HiOutlineExternalLink } from 'react-icons/hi'
 import 'twin.macro'
 import { ConnectButton } from '../web3/ConnectButton'
 
@@ -8,28 +7,30 @@ export const HomeTopBar: FC = () => {
   return (
     <>
       <div>
-        <nav className="bg-gray-100 border-gray-200 border-b-gray-400 border-2">
-          <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
-            <a href="" className="flex items-center">
+        <nav tw="border-gray-200 border-2 border-b-gray-400 bg-gray-100">
+          <div tw="mx-auto flex max-w-screen-xl flex-wrap items-center justify-between p-4">
+            <a href="" tw="flex items-center">
               <img
                 src="https://image.similarpng.com/very-thumbnail/2021/09/A-abstract-logo-design-on-transparent-background-PNG.png"
-                className="h-8 mr-3"
+                tw="mr-3 h-8"
                 alt="Flowbite Logo"
               />
-              <span className="self-center text-2xl font-semibold whitespace-nowrap">Flowbite</span>
+              <span tw="self-center whitespace-nowrap font-semibold text-2xl text-gray-900">
+                inkCards
+              </span>
             </a>
-            <div className="flex md:order-2">
+            <div tw="flex md:order-2">
               <ConnectButton />
             </div>
             <div
-              className="items-center justify-between hidden w-full md:flex md:w-auto md:order-1"
+              tw="hidden w-full items-center justify-between md:(order-1 flex w-auto)"
               id="navbar-cta"
             >
-              <ul className="flex flex-col font-medium p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:flex-row md:space-x-8 md:mt-0 md:border-0 md:bg-gray-100">
+              <ul tw="mt-4 flex flex-col rounded-lg border border-gray-100 bg-gray-100 p-4 font-medium md:(mt-0 flex-row space-x-8 border-0 p-0)">
                 <li>
                   <Link
-                    href="#"
-                    className="block py-2 pl-3 pr-4 text-white bg-blue-700 rounded md:bg-transparent md:text-blue-700 md:p-0"
+                    href="/"
+                    tw="block rounded bg-gray-100 py-2 pl-3 pr-4 text-gray-900 md:(p-0 hover:text-blue-700)"
                     aria-current="page"
                   >
                     Home
@@ -37,26 +38,26 @@ export const HomeTopBar: FC = () => {
                 </li>
                 <li>
                   <Link
-                    href="#"
-                    className="block py-2 pl-3 pr-4 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0"
+                    href="/pools"
+                    tw="block rounded bg-gray-100 py-2 pl-3 pr-4 text-gray-900 hover:bg-gray-100 md:(p-0 hover:(bg-transparent text-blue-700))"
                   >
-                    About
+                    Manage
                   </Link>
                 </li>
                 <li>
                   <Link
                     href="#"
-                    className="block py-2 pl-3 pr-4 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0"
+                    tw="block rounded bg-gray-100 py-2 pl-3 pr-4 text-gray-900 hover:bg-gray-100 md:(p-0 hover:(bg-transparent text-blue-700))"
                   >
-                    Services
+                    Spend
                   </Link>
                 </li>
                 <li>
                   <Link
-                    href="#"
-                    className="block py-2 pl-3 pr-4 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0"
+                    href="/create"
+                    tw="block rounded bg-gray-100 py-2 pl-3 pr-4 text-gray-900 hover:bg-gray-100 md:(p-0 hover:(bg-transparent text-blue-700))"
                   >
-                    Contact
+                    Create
                   </Link>
                 </li>
               </ul>

@@ -71,12 +71,13 @@ export const ConnectButton: FC<ConnectButtonProps> = () => {
           py={6}
           fontWeight="bold"
           rounded="2xl"
-          colorScheme="purple"
+          backgroundColor="blue.500"
+          _hover={{ backgroundColor: 'blue.500' }}
         >
           Connect Wallet
         </MenuButton>
 
-        <MenuList bgColor="blackAlpha.900" borderColor="whiteAlpha.300" rounded="2xl">
+        <MenuList bgColor="blue.500" borderColor="whiteAlpha.300" rounded="2xl">
           {/* Installed Wallets */}
           {!isSSR &&
             !activeAccount &&
@@ -87,7 +88,7 @@ export const ConnectButton: FC<ConnectButtonProps> = () => {
                   onClick={() => {
                     connect?.(undefined, w)
                   }}
-                  tw="bg-transparent hocus:bg-gray-800"
+                  tw="bg-transparent hocus:bg-blue-400"
                 >
                   {w.name}
                 </MenuItem>
@@ -96,7 +97,7 @@ export const ConnectButton: FC<ConnectButtonProps> = () => {
                   as={Link}
                   href={w.urls.website}
                   key={w.id}
-                  tw="bg-transparent opacity-50 hocus:bg-gray-800 hover:(no-underline opacity-70)"
+                  tw="bg-transparent opacity-50 hocus:bg-blue-400 hover:(no-underline opacity-70)"
                 >
                   <VStack align="start" spacing={0}>
                     <HStack>
@@ -127,6 +128,7 @@ export const ConnectButton: FC<ConnectButtonProps> = () => {
             fontFamily="mono"
             letterSpacing={-0.25}
             pointerEvents="none"
+            backgroundColor="blue.500"
           >
             {balanceFormatted}
           </Button>
@@ -141,6 +143,8 @@ export const ConnectButton: FC<ConnectButtonProps> = () => {
           pl={5}
           rounded="2xl"
           fontWeight="bold"
+          backgroundColor="blue.500"
+          _hover={{ backgroundColor: 'blue.500' }}
         >
           <VStack spacing={0.5}>
             <AccountName account={activeAccount} />
@@ -152,7 +156,7 @@ export const ConnectButton: FC<ConnectButtonProps> = () => {
       </HStack>
 
       <MenuList
-        bgColor="blackAlpha.900"
+        bgColor="blue.500"
         borderColor="whiteAlpha.300"
         rounded="2xl"
         maxHeight="40vh"
@@ -167,7 +171,7 @@ export const ConnectButton: FC<ConnectButtonProps> = () => {
               await switchActiveChain?.(chain)
               toast.success(`Switched to ${chain.name}`)
             }}
-            tw="bg-transparent hocus:bg-gray-800"
+            tw="bg-transparent hocus:bg-blue-400"
           >
             <VStack align="start" spacing={0}>
               <HStack>
@@ -190,7 +194,7 @@ export const ConnectButton: FC<ConnectButtonProps> = () => {
               onClick={() => {
                 setActiveAccount?.(acc)
               }}
-              tw="bg-transparent hocus:bg-gray-800"
+              tw="bg-transparent hocus:bg-blue-400"
             >
               <VStack align="start" spacing={0}>
                 <HStack>
@@ -208,7 +212,7 @@ export const ConnectButton: FC<ConnectButtonProps> = () => {
         <MenuItem
           onClick={() => disconnect?.()}
           icon={<AiOutlineDisconnect size={18} />}
-          tw="bg-transparent hocus:bg-gray-800"
+          tw="bg-transparent hocus:bg-blue-400"
         >
           Disconnect
         </MenuItem>
