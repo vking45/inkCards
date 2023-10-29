@@ -1,23 +1,18 @@
-import React, { FC, useEffect, useState, ChangeEvent } from 'react'
-import 'twin.macro'
-import type { NextPage } from 'next'
-import { toast } from 'react-hot-toast'
-import {
-  contractQuery,
-  decodeOutput,
-  useInkathon,
-  useRegisteredContract,
-} from '@scio-labs/use-inkathon'
 import { HomeTopBar } from '@/components/home/HomeTopBar'
 import { ContractIds } from '@/deployments/deployments'
 import { contractTxWithToast } from '@/utils/contractTxWithToast'
+import { useInkathon, useRegisteredContract } from '@scio-labs/use-inkathon'
+import type { NextPage } from 'next'
+import { ChangeEvent, useEffect, useState } from 'react'
+import { toast } from 'react-hot-toast'
+import 'twin.macro'
 
 const CreateForm: NextPage = () => {
   const { api, activeAccount, activeSigner } = useInkathon()
   const { contract, address: contractAddress } = useRegisteredContract(ContractIds.Factory)
   const [updateIsLoading, setUpdateIsLoading] = useState<boolean>()
 
-  const [amount, setAmount] = useState<string>('$')
+  const [amount, setAmount] = useState<string>('$0')
   const [name, setName] = useState<string>('')
 
   const createPool = async () => {
@@ -88,6 +83,7 @@ const CreateForm: NextPage = () => {
                   required
                   value={amount}
                   onChange={handleAmountChange}
+                  disabled
                 />
               </div>
 

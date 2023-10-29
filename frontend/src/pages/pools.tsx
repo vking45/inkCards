@@ -1,17 +1,18 @@
-import React, { FC, useEffect, useState } from 'react'
+import { HomeTopBar } from '@/components/home/HomeTopBar'
+import { ContractIds } from '@/deployments/deployments'
+import { getPoolsDeployments } from '@/deployments/poolsDeployments'
+import { ContractPromise } from '@polkadot/api-contract'
 import {
   contractQuery,
   decodeOutput,
   useInkathon,
   useRegisteredContract,
 } from '@scio-labs/use-inkathon'
-import { ContractIds } from '@/deployments/deployments'
-import { contractTxWithToast } from '@/utils/contractTxWithToast'
-import 'twin.macro'
 import type { NextPage } from 'next'
-import { toast } from 'react-hot-toast'
-import { HomeTopBar } from '@/components/home/HomeTopBar'
 import Link from 'next/link'
+import { useEffect, useState } from 'react'
+import { toast } from 'react-hot-toast'
+import 'twin.macro'
 
 interface Pool {
   amount: string
@@ -25,22 +26,38 @@ const ManageScreen: NextPage = () => {
   const [fetchIsLoading, setFetchIsLoading] = useState<boolean>()
 
   const fetchPools = async () => {
-    if (!activeAccount || !contract || !activeSigner || !api) {
-      toast.error('Wallet not connected. Try again…')
+    if (!contract || !api) {
+      // toast.error('Wallet not connected. Try again…')
       return
     }
 
     setFetchIsLoading(true)
     try {
-      const result = await contractTxWithToast(
-        api,
-        activeAccount.address,
+      const result = await contractQuery(api, '', contract, 'getDeployedContracts')
+      const { output, isError, decodedOutput } = decodeOutput(
+        result,
         contract,
         'getDeployedContracts',
-        {},
-        [],
       )
-      console.log(result)
+      if (isError) throw new Error(decodedOutput)
+      const pools_res = await getPoolsDeployments(output)
+      const temp = []
+      for (const i of pools_res) {
+        const _contract = new ContractPromise(api, i.abi, i.address)
+        const _result = await contractQuery(api, '', _contract, 'getPoolName')
+        const { output } = decodeOutput(_result, _contract, 'getPoolName')
+        const _name = output
+        const _result2 = await contractQuery(api, '', _contract, 'getPoolSize')
+        const output2 = decodeOutput(_result2, _contract, 'getPoolSize')
+        console.log(output2)
+        const size = output2.output
+
+        temp.push({
+          amount: String(size),
+          description: _name,
+        })
+      }
+      setPools(temp)
     } catch (e) {
       console.error(e)
       toast.error('Error while fetching pools. Try again…')
@@ -74,7 +91,7 @@ const ManageScreen: NextPage = () => {
                 : pools.map((pool, index) => (
                     <div key={index} tw="p-4 lg:w-1/3">
                       <div tw="relative h-full cursor-pointer overflow-hidden rounded-lg bg-gradient-to-b bg-opacity-75 from-emerald-600 to-emerald-800 px-8 pt-16 pb-24 text-center transition-all duration-300 hover:scale-105">
-                        <h1 tw="mb-3 font-medium text-8xl text-gray-100">{pool.amount}</h1>
+                        <h1 tw="mb-3 font-medium text-8xl text-gray-100">${pool.amount}</h1>
                         <p tw="mb-3 text-gray-200 leading-10 tracking-widest">{pool.description}</p>
                       </div>
                     </div>
