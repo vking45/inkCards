@@ -144,6 +144,16 @@ pub mod ink_cards {
         }
 
         #[ink(message)]
+        pub fn get_pool_name(&self) -> Vec<u8> {
+            self.pool_name.clone()
+        }
+
+        #[ink(message)]
+        pub fn get_pool_size(&self) -> Balance {
+            self.pool_size
+        }
+
+        #[ink(message)]
         pub fn get_address(&self) -> AccountId {
             <Self as DefaultEnv>::env().account_id()
         }
