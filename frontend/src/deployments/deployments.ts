@@ -5,9 +5,8 @@ import { SubstrateDeployment } from '@scio-labs/use-inkathon'
  * Add or change your custom contract ids here
  * DOCS: https://github.com/scio-labs/inkathon#2-custom-contracts
  */
-export enum ContractIds {
-  Factory = 'factory',
-}
+export enum ContractIds {}
+//  Factory = 'factory',
 
 export const getDeployments = async (): Promise<SubstrateDeployment[]> => {
   const networks = env.supportedChains
