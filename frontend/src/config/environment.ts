@@ -9,8 +9,8 @@ import { getURL } from './getUrl'
  */
 export const env = {
   url: getURL(),
-  isProduction: process.env.NEXT_PUBLIC_PRODUCTION_MODE === 'true',
+  isProduction: 'true',
 
-  defaultChain: process.env.NEXT_PUBLIC_DEFAULT_CHAIN!,
+  defaultChain: 'alephzero-testnet',
   supportedChains: getSupportedChains(),
 }
