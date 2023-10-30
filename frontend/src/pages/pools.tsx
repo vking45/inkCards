@@ -93,7 +93,9 @@ const ManageScreen: NextPage = () => {
                 : pools.map((pool, index) => (
                     <Link href={`/interact/${pool.address}`} key={index} tw="p-4 lg:w-1/3">
                       <div tw="relative h-full cursor-pointer overflow-hidden rounded-lg bg-gradient-to-b bg-opacity-75 from-emerald-600 to-emerald-800 px-8 pt-16 pb-24 text-center transition-all duration-300 hover:scale-105">
-                        <h1 tw="mb-3 font-medium text-8xl text-gray-100">${pool.amount}</h1>
+                        <h1 tw="mb-3 font-medium text-8xl text-gray-100">
+                          ${Number(pool.amount.replaceAll(',', '')) / 10 ** 12}
+                        </h1>
                         <p tw="mb-3 text-gray-200 leading-10 tracking-widest">{pool.description}</p>
                       </div>
                     </Link>

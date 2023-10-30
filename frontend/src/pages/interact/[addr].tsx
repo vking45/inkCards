@@ -1,19 +1,13 @@
-import React, { useState, useEffect } from 'react'
-import 'twin.macro'
 import { HomeTopBar } from '@/components/home/HomeTopBar'
-import { useRouter } from 'next/router'
-import { ContractPromise } from '@polkadot/api-contract'
-import { ContractIds } from '@/deployments/deployments'
-import { BN } from '@polkadot/util/bn'
 import { contractTxWithToast } from '@/utils/contractTxWithToast'
-import {
-  contractQuery,
-  decodeOutput,
-  useInkathon,
-  useRegisteredContract,
-} from '@scio-labs/use-inkathon'
+import { ContractPromise } from '@polkadot/api-contract'
+import { BN } from '@polkadot/util/bn'
+import { contractQuery, decodeOutput, useInkathon } from '@scio-labs/use-inkathon'
 import type { NextPage } from 'next'
+import { useRouter } from 'next/router'
+import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
+import 'twin.macro'
 
 interface ModalContent {
   title: string
@@ -60,8 +54,8 @@ const Interaction: NextPage = () => {
         activeAccount.address,
         contract,
         'addFunds',
-        { value: new BN(funds).mul(decimals) },
-        [funds],
+        { value: funds * 10 ** 12 },
+        [funds * 10 ** 12],
       )
       console.log(res)
     } catch (e) {
@@ -129,7 +123,7 @@ const Interaction: NextPage = () => {
     setName(output)
     const _result2 = await contractQuery(api, '', contract, 'getPoolSize')
     const output2 = decodeOutput(_result2, contract, 'getPoolSize')
-    setSize('$' + output2.output)
+    setSize(output2.output)
     const _result3 = await contractQuery(api, '', contract, 'psp34::totalSupply')
     const output3 = decodeOutput(_result3, contract, 'psp34::totalSupply')
     setSupply(output3.output)
@@ -157,7 +151,9 @@ const Interaction: NextPage = () => {
 
         <div tw="mb-6 p-4 lg:w-1/3">
           <div tw="relative h-full cursor-pointer overflow-hidden rounded-lg bg-gradient-to-b bg-opacity-75 from-emerald-600 to-emerald-800 px-8 pt-16 pb-24 text-center transition-all duration-300 hover:scale-105">
-            <h1 tw="mb-3 font-medium text-8xl text-white">{fetchIsLoading ? 'Loading..' : size}</h1>
+            <h1 tw="mb-3 font-medium text-8xl text-white">
+              ${fetchIsLoading ? '..' : Number(size.replaceAll(',', '')) / 10 ** 12}
+            </h1>
             <p tw="text-white leading-10 tracking-widest">{fetchIsLoading ? 'Loading..' : name}</p>
           </div>
         </div>
