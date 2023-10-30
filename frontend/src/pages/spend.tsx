@@ -1,18 +1,18 @@
-import React, { useState, useEffect } from 'react'
 import { HomeTopBar } from '@/components/home/HomeTopBar'
-import { contractTxWithToast } from '@/utils/contractTxWithToast'
 import { ContractIds } from '@/deployments/deployments'
 import { getPoolsDeployments } from '@/deployments/poolsDeployments'
+import { contractTxWithToast } from '@/utils/contractTxWithToast'
 import { ContractPromise } from '@polkadot/api-contract'
-import { toast } from 'react-hot-toast'
 import {
   contractQuery,
   decodeOutput,
   useInkathon,
   useRegisteredContract,
 } from '@scio-labs/use-inkathon'
-import 'twin.macro'
 import { NextPage } from 'next'
+import { useEffect, useState } from 'react'
+import { toast } from 'react-hot-toast'
+import 'twin.macro'
 
 interface Card {
   token_id: number
@@ -27,7 +27,7 @@ const SpenderScreen: NextPage = () => {
   const [cards, setCards] = useState<Card[]>([])
   const [walletAddress, setWalletAddress] = useState<string>('')
   const [amount, setAmount] = useState<number>(0)
-  const [selectedCard, setSelectedCard] = useState<number | null>(null)
+  const [selectedCard, setSelectedCard] = useState<number>(1)
   const { api, activeAccount, activeSigner } = useInkathon()
   const { contract, address: contractAddress } = useRegisteredContract(ContractIds.Factory)
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
@@ -51,7 +51,7 @@ const SpenderScreen: NextPage = () => {
 
   const onSpend = async () => {
     setFetchIsLoading(true)
-    if (!api || !activeAccount || !selectedCard) {
+    if (!api || !activeAccount) {
       toast.error('API error. Try again...')
       return
     }
@@ -68,7 +68,7 @@ const SpenderScreen: NextPage = () => {
         _contract,
         'card::spendFromCard',
         {},
-        [cards[selectedCard].token_id, amount, walletAddress],
+        [{ u128: cards[selectedCard].token_id }, amount * 10 ** 14, walletAddress],
       )
       console.log(res)
     } catch (e) {
@@ -80,11 +80,10 @@ const SpenderScreen: NextPage = () => {
   }
 
   const fetchCards = async () => {
-    if (!contract || !api) {
+    if (!contract || !api || !activeAccount) {
       // toast.error('Wallet not connected. Try again…')
       return
     }
-
     setFetchIsLoading(true)
     try {
       const result = await contractQuery(api, '', contract, 'getDeployedContracts')
@@ -100,36 +99,43 @@ const SpenderScreen: NextPage = () => {
         const _contract = new ContractPromise(api, i.abi, i.address)
         const _result = await contractQuery(api, '', _contract, 'psp34::totalSupply')
         const { output } = decodeOutput(_result, _contract, 'psp34::totalSupply')
-        const supply = Number(output.replaceAll(',', ''))
+        console.log(output)
+        const supply = Number(output)
         let count = 1
-        while (count <= supply) {
-          const _result2 = await contractQuery(api, '', _contract, 'psp34::ownerOf', {}, [count])
-          const _output2 = decodeOutput(_result2, _contract, 'psp34::ownerOf')
-          if (_output2.output == activeAccount?.address) {
-            const _result3 = await contractQuery(api, '', _contract, 'card::getCardInfo', {}, [
-              count,
+        if (supply > 0) {
+          while (count <= supply) {
+            const _result2 = await contractQuery(api, '', _contract, 'psp34::ownerOf', {}, [
+              { u128: count },
             ])
-            const _output3 = decodeOutput(_result3, _contract, 'card::getCardInfo')
-            temp.push({
-              token_id: count,
-              addr: i.address,
-              available:
-                (Number(_output3.output.spendLimit.replaceAll(',', '')) -
-                  Number(_output3.output.spentAmount.replaceAll(',', ''))) /
-                10 ** 12,
-              limit: Number(_output3.output.spendLimit.replaceAll(',', '')),
-              name: _output3.output.cardName,
-              expiration: Number(_output3.output.expiration.replaceAll(',', '')),
-            })
+            const _output2 = decodeOutput(_result2, _contract, 'psp34::ownerOf')
+            console.log(_output2.output)
+            if (_output2.output == activeAccount.address) {
+              const _result3 = await contractQuery(api, '', _contract, 'card::getCardInfo', {}, [
+                { u128: count },
+              ])
+              const _output3 = decodeOutput(_result3, _contract, 'card::getCardInfo')
+              console.log(_output3.output.Ok)
+              temp.push({
+                token_id: count,
+                addr: i.address,
+                available:
+                  (Number(_output3.output.Ok.spendLimit.replaceAll(',', '')) -
+                    Number(_output3.output.Ok.spentAmount.replaceAll(',', ''))) /
+                  10 ** 14,
+                limit: Number(_output3.output.Ok.spendLimit.replaceAll(',', '')) / 10 ** 14,
+                name: _output3.output.Ok.cardName,
+                expiration: Number(_output3.output.Ok.expiration.replaceAll(',', '')),
+              })
+            }
+            count += 1
           }
-          count += 1
         }
       }
       console.log(temp)
       setCards(temp)
     } catch (e) {
       console.error(e)
-      toast.error('Error while fetching pools. Try again…')
+      toast.error('Error while fetching cards. Try again…')
     } finally {
       setFetchIsLoading(false)
     }
@@ -137,48 +143,25 @@ const SpenderScreen: NextPage = () => {
 
   useEffect(() => {
     fetchCards()
-  }, [contract])
+  }, [activeAccount])
 
   return (
     <>
       <HomeTopBar />
-      <section tw="body-font flex min-h-screen flex-col items-center justify-center bg-gray-200 p-5 text-gray-600">
+      <section tw="flex min-h-screen flex-col items-center justify-center bg-gray-200 p-5 text-gray-600">
         <div tw="container mx-auto mb-4">
           <h1 tw="mb-6 text-center font-bold text-4xl text-black">Select your card</h1>
-          <div tw="-m-4 flex flex-wrap">
+          <div tw="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
             {cards.map((card, index) => (
-              <div key={index} tw="p-4 lg:w-1/3">
+              <div key={index}>
                 <div
                   onClick={() => handleCardClick(index)}
-                  tw={`relative h-full overflow-hidden rounded-lg text-white${
-                    selectedCard === index ? 'border-4 border-green-500' : ''
-                  }`}
-                  style={{
-                    background: 'linear-gradient(135deg, #3B4A6D, #1E2A47, #152238)',
-                    height: '250px',
-                  }}
+                  tw="relative transform cursor-pointer rounded-lg border-4 border-green-500 bg-gradient-to-tr from-blue-700 to-indigo-700 p-4 text-white shadow-lg transition-transform hover:scale-105"
                 >
-                  <div tw="absolute top-4 left-4">
-                    <h1 tw="font-bold text-4xl">${Math.floor(Math.random() * 10000) + 1000}.00</h1>
-                    <p tw="mt-2 text-md">Balance</p>
-                  </div>
-
-                  <div tw="absolute bottom-4 left-4">
-                    <h2 tw="font-thin text-lg tracking-widest">{card.name}</h2>
-                  </div>
-
-                  <div tw="absolute top-4 right-4">
-                    <div tw="rounded-full bg-white p-1">
-                      <div tw="h-6 w-6 rounded-full bg-red-500"></div>
-                    </div>
-                  </div>
+                  <h1 tw="mb-2 font-bold text-4xl">Av. ${card.available}</h1>
+                  <p tw="mb-2">Limit. ${card.limit}</p>
+                  <h2 tw="font-thin text-lg tracking-widest">{card.name}</h2>
                 </div>
-                <button
-                  onClick={() => handleTransferClick(index)}
-                  tw="mt-4 rounded bg-blue-500 px-4 py-2 text-white"
-                >
-                  Transfer Card
-                </button>
               </div>
             ))}
             {isModalOpen && (
@@ -209,9 +192,7 @@ const SpenderScreen: NextPage = () => {
         </div>
 
         <div tw="container mx-auto rounded-lg bg-white p-10 shadow-xl">
-          <h1 tw="title-font mb-6 text-center font-bold text-4xl text-gray-900">
-            Enter Wallet Address
-          </h1>
+          <h1 tw="mb-6 text-center font-bold text-4xl text-gray-900">Enter Wallet Address</h1>
           <div tw="flex flex-col items-center">
             <input
               type="text"
@@ -232,7 +213,7 @@ const SpenderScreen: NextPage = () => {
               tw="mt-4 rounded bg-blue-700 py-2 px-4 font-bold text-white hover:bg-blue-800"
               onClick={onSpend}
             >
-              Spend
+              {fetchIsLoading ? 'Loading..' : 'Spend'}
             </button>
           </div>
         </div>

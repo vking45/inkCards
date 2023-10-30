@@ -1,14 +1,9 @@
-import { HomePageTitle } from '@/components/home/HomePageTitle'
 import { HomeTopBar } from '@/components/home/HomeTopBar'
-import { CenterBody } from '@/components/layout/CenterBody'
-import { ChainInfo } from '@/components/web3/ChainInfo'
-import { ConnectButton } from '@/components/web3/ConnectButton'
-import { GreeterContractInteractions } from '@/components/web3/GreeterContractInteractions'
 import { useInkathon } from '@scio-labs/use-inkathon'
 import type { NextPage } from 'next'
+import Link from 'next/link'
 import { useEffect } from 'react'
 import { toast } from 'react-hot-toast'
-import Link from 'next/link'
 import 'twin.macro'
 
 const TestPage: NextPage = () => {
@@ -56,19 +51,21 @@ const TestPage: NextPage = () => {
                 'linear-gradient(180deg, rgb(37 99 235 / var(--tw-bg-opacity)), rgb(29 78 216 / var(--tw-bg-opacity)), rgb(30 64 175 / var(--tw-bg-opacity)))',
             }}
           >
-            Spender
-            <div tw="mt-8 flex justify-center">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="#ffffff"
-                tw="h-24 w-24"
-                height="24"
-                viewBox="0 -960 960 960"
-                width="24"
-              >
-                <path d="M840-695.385v430.77Q840-237 821.5-218.5 803-200 775.385-200h-590.77Q157-200 138.5-218.5 120-237 120-264.615v-430.77Q120-723 138.5-741.5 157-760 184.615-760h590.77Q803-760 821.5-741.5 840-723 840-695.385Zm-680 87.692h640v-87.692q0-9.23-7.692-16.923Q784.615-720 775.385-720h-590.77q-9.23 0-16.923 7.692Q160-704.615 160-695.385v87.692Zm0 95.386v247.692q0 9.23 7.692 16.923Q175.385-240 184.615-240h590.77q9.23 0 16.923-7.692Q800-255.385 800-264.615v-247.692H160ZM160-240v-480 480Z" />
-              </svg>
-            </div>
+            <Link href={'/spend'}>
+              Spender
+              <div tw="mt-8 flex justify-center">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="#ffffff"
+                  tw="h-24 w-24"
+                  height="24"
+                  viewBox="0 -960 960 960"
+                  width="24"
+                >
+                  <path d="M840-695.385v430.77Q840-237 821.5-218.5 803-200 775.385-200h-590.77Q157-200 138.5-218.5 120-237 120-264.615v-430.77Q120-723 138.5-741.5 157-760 184.615-760h590.77Q803-760 821.5-741.5 840-723 840-695.385Zm-680 87.692h640v-87.692q0-9.23-7.692-16.923Q784.615-720 775.385-720h-590.77q-9.23 0-16.923 7.692Q160-704.615 160-695.385v87.692Zm0 95.386v247.692q0 9.23 7.692 16.923Q175.385-240 184.615-240h590.77q9.23 0 16.923-7.692Q800-255.385 800-264.615v-247.692H160ZM160-240v-480 480Z" />
+                </svg>
+              </div>
+            </Link>
           </button>
         </div>
       </div>

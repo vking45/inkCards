@@ -46,7 +46,7 @@ export const HomeTopBar: FC = () => {
                 </li>
                 <li>
                   <Link
-                    href="#"
+                    href="/spend"
                     tw="block rounded bg-gray-100 py-2 pl-3 pr-4 text-gray-900 hover:bg-gray-100 md:(p-0 hover:(bg-transparent text-blue-700))"
                   >
                     Spend
