@@ -68,7 +68,7 @@ const SpenderScreen: NextPage = () => {
         _contract,
         'card::spendFromCard',
         {},
-        [{ u128: cards[selectedCard].token_id }, amount * 10 ** 14, walletAddress],
+        [{ u128: cards[selectedCard].token_id }, amount * 10 ** 12, walletAddress],
       )
       console.log(res)
     } catch (e) {
