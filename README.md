@@ -1,4 +1,6 @@
-# InkCards by Team Vanguard
+# [Winner : Aleph Zero DeFi & Infrastructure Track (2nd Position)](https://www.blog.encode.club/polkadot-ink-hackathon-powered-by-encode-club-prizewinners-and-summary-0ee9efac42ea)
+
+## InkCards by Team Vanguard
 
 ## Table of Contents
 - [Problem Statement](#problem-statement)
